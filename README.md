@@ -16,21 +16,15 @@
 
 ## Overview
 
-**MetaEvidence** registers JSON schemas for external resources (AI models, APIs, datasets) and audits attached metadata under `eq_principle_strict_eq`.
+**MetaEvidence v0.2** registers JSON schemas and freezes **live HTTPS pages** (`get_webpage` → SHA-256) under `eq_principle_strict_eq`, then audits by re-fetching + schema-checking metadata.
 
 ```
-register_schema → attach_evidence → audit → valid | invalid
+register_schema → attach_evidence (freeze) → audit → valid | invalid → appeal (max 3)
 ```
-
-| Event | When |
-|-------|------|
-| `SchemaRegistered` | new schema id |
-| `EvidenceAttached` | metadata + data_hash linked |
-| `AuditPerformed` / `AuditResult` | consensus field + hash check |
 
 ### Why GenLayer
 
-AI providers publish models and APIs with claims (version, signature, license). MetaEvidence turns those claims into an on-chain **audit passport** — independent of the publisher’s code repo.
+Validators independently fetch the same `source_url`. Consensus is on the digest + schema report — not a self-attested hash. Same optimistic-democracy path as [EvidenceHub](https://github.com/valentinzubok/EvidenceHub).
 
 ## Install
 
@@ -49,11 +43,7 @@ See [`docs/API.md`](docs/API.md).
 
 ## Demo
 
-```bash
-cd demo && python3 -m http.server 5176
-```
-
-Live: https://valentinzubok.github.io/MetaEvidence/
+https://valentinzubok.github.io/MetaEvidence/
 
 ## License
 

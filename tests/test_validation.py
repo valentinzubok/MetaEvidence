@@ -8,18 +8,10 @@ from conftest import load_contract
 ROOT = Path(__file__).resolve().parents[1]
 mod = load_contract(ROOT, "MetaEvidence.py")
 
-SCHEMA = json.dumps(
-    {
-        "type": "object",
-        "required": ["model", "version"],
-        "properties": {"model": {"type": "string"}, "version": {"type": "string"}},
-    }
-)
-
 
 def test_parse_schema_ok():
-    parsed = mod._parse_schema(SCHEMA)
-    assert parsed["required"] == ["model", "version"]
+    schema = '{"required":["a"],"properties":{"a":{"type":"string"}}}'
+    assert mod._parse_schema(schema)["required"] == ["a"]
 
 
 def test_parse_schema_invalid_json():
@@ -27,18 +19,17 @@ def test_parse_schema_invalid_json():
         mod._parse_schema("{bad")
 
 
-def test_build_audit_report_valid():
-    schema = json.loads(SCHEMA)
-    meta = {"model": "gpt-demo", "version": "1.0"}
-    digest = mod._hash_text(json.dumps(meta, sort_keys=True, separators=(",", ":")))
-    report = json.loads(mod._build_audit_report(schema, meta, digest))
-    assert report["valid"] is True
+def test_json_type_rejects_unknown():
+    assert mod._json_type_ok("x", "string") is True
+    assert mod._json_type_ok([], "mystery") is False
 
 
-def test_build_audit_report_missing_field():
-    schema = json.loads(SCHEMA)
-    meta = {"model": "gpt-demo"}
-    digest = mod._hash_text(json.dumps(meta, sort_keys=True, separators=(",", ":")))
-    report = json.loads(mod._build_audit_report(schema, meta, digest))
-    assert report["valid"] is False
-    assert "version" in report["missing_fields"]
+def test_require_https():
+    with pytest.raises(Exception, match="https"):
+        mod._require_https("http://example.com")
+
+
+def test_capture_source_ok():
+    raw = json.loads(mod._capture_source("https://example.com/a"))
+    assert raw["status"] == "ok"
+    assert len(raw["content_hash"]) == 64
