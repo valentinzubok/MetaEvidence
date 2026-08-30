@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MetaEvidence demo</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+    body { margin: 0; background: #09090b; color: #e4e4e7; }
+    main { max-width: 960px; margin: 0 auto; padding: 1.5rem; }
+    h1 { color: #818cf8; font-size: 1.35rem; }
+    .grid { display: grid; gap: 1rem; }
+    @media (min-width: 860px) { .grid { grid-template-columns: 1fr 1fr; } }
+    .card { background: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 1rem; }
+    label { display: block; margin-top: 0.55rem; font-size: 0.8rem; color: #a1a1aa; }
+    input, textarea { width: 100%; box-sizing: border-box; margin-top: 0.2rem; background: #09090b;
+      border: 1px solid #3f3f46; border-radius: 8px; color: #fff; padding: 0.55rem; }
+    button { margin: 0.35rem 0.35rem 0 0; background: #6366f1; border: 0; color: #fff; font-weight: 700;
+      padding: 0.5rem 0.8rem; border-radius: 8px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th, td { border-bottom: 1px solid #27272a; padding: 0.45rem; text-align: left; }
+    .ok { color: #6ee7b7; } .bad { color: #fca5a5; } .pend { color: #fde68a; }
+    .hint { color: #71717a; font-size: 0.8rem; }
+    pre { font-size: 0.7rem; overflow: auto; background: #09090b; padding: 0.75rem; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState } = React;
+    const KEY = "metaevidence-demo-v1";
+    const SCHEMA = '{"required":["model","version"],"properties":{"model":{"type":"string"},"version":{"type":"string"}}}';
+    const load = () => { try { return JSON.parse(localStorage.getItem(KEY)||"[]"); } catch { return []; } };
+    const save = (rows) => localStorage.setItem(KEY, JSON.stringify(rows));
+
+    function App() {
+      const [rows, setRows] = useState(load);
+      const [eid, setEid] = useState("ev-demo-1");
+      const [meta, setMeta] = useState('{"model":"gpt-demo","version":"1.0"}');
+      const [studio, setStudio] = useState({ method: "register_schema", args: ["model-v1", SCHEMA] });
+
+      const commit = (next) => { setRows(next); save(next); };
+      const attach = () => {
+        if (rows.some(r => r.id === eid)) return alert("duplicate");
+        commit([...rows, { id: eid, meta, status: "pending_audit" }]);
+        setStudio({ method: "attach_evidence", args: [eid, "model-v1", "<sha256>", meta] });
+      };
+      const audit = (id, pass=true) => {
+        commit(rows.map(r => r.id !== id ? r : { ...r, status: pass ? "valid" : "invalid" }));
+        setStudio({ method: "audit", args: [id] });
+      };
+
+      return (
+        <main>
+          <h1>MetaEvidence — Schema → Attach → Audit</h1>
+          <p className="hint">Local mock. <code>python3 -m http.server 5176</code></p>
+          <div className="grid">
+            <div className="card">
+              <label>evidence_id</label><input value={eid} onChange={e=>setEid(e.target.value)} />
+              <label>metadata_json</label><textarea rows={4} value={meta} onChange={e=>setMeta(e.target.value)} />
+              <button onClick={attach}>attach_evidence</button>
+            </div>
+            <div className="card">
+              <table><thead><tr><th>id</th><th>status</th><th></th></tr></thead>
+                <tbody>{rows.map(r => (
+                  <tr key={r.id}><td>{r.id}</td>
+                    <td className={r.status==="valid"?"ok":r.status==="invalid"?"bad":"pend"}>{r.status}</td>
+                    <td>{r.status==="pending_audit" && <>
+                      <button onClick={()=>audit(r.id,true)}>audit ✓</button>
+                      <button onClick={()=>audit(r.id,false)}>audit ✗</button></>}</td></tr>
+                ))}</tbody></table>
+            </div>
+          </div>
+          <div className="card" style={{marginTop:"1rem"}}><pre>{JSON.stringify(studio, null, 2)}</pre></div>
+        </main>
+      );
+    }
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
