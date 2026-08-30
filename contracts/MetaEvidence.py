@@ -76,6 +76,18 @@ def _parse_metadata(metadata_json: str) -> dict:
     return parsed
 
 
+def _json_type_ok(value, expected_type: str) -> bool:
+    if expected_type == "string":
+        return isinstance(value, str)
+    if expected_type == "integer":
+        return isinstance(value, int) and not isinstance(value, bool)
+    if expected_type == "number":
+        return isinstance(value, (int, float)) and not isinstance(value, bool)
+    if expected_type == "boolean":
+        return isinstance(value, bool)
+    return True
+
+
 def _build_audit_report(schema: dict, metadata: dict, declared_hash: str) -> str:
     required = schema.get("required", [])
     props = schema.get("properties", {}) or {}
@@ -87,21 +99,8 @@ def _build_audit_report(schema: dict, metadata: dict, declared_hash: str) -> str
             continue
         expected = props.get(field, {})
         expected_type = expected.get("type")
-        if expected_type and expected_type != type(metadata[field]).__name__:
-            # map python types loosely
-            py_map = {
-                "string": "str",
-                "integer": "int",
-                "number": ("int", "float"),
-                "boolean": "bool",
-            }
-            allowed = py_map.get(expected_type, expected_type)
-            if isinstance(allowed, tuple):
-                ok = type(metadata[field]).__name__ in allowed
-            else:
-                ok = type(metadata[field]).__name__ == allowed
-            if not ok:
-                type_mismatch.append({"field": field, "expected": expected_type})
+        if expected_type and not _json_type_ok(metadata[field], expected_type):
+            type_mismatch.append({"field": field, "expected": expected_type})
 
     computed_hash = _hash_text(json.dumps(metadata, sort_keys=True, separators=(",", ":")))
     hash_match = computed_hash == str(declared_hash).strip()
