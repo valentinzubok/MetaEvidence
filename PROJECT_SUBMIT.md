@@ -40,7 +40,7 @@ Use case: register JSON schemas, attach live HTTPS evidence (get_webpage + stric
 
 Intelligent Contract (in-repo): contracts/MetaEvidence.py
 Studionet: 0xF39330E2233E612CCcbAb1B148C94b136dEAE54C
-App: web/ (Next.js) — LIVE_URL_AFTER_DEPLOY
+App: web/ (Next.js) — https://metaevidence-console.vercel.app
 GitHub: https://github.com/valentinzubok/MetaEvidence
 
 Smoke txs (IC, already submitted separately):
@@ -52,6 +52,6 @@ audit 0x4562f5e816a083b3dfd6672eb7ca8d360df260da11eb9679e7245f7b6576f202
 ## Evidence
 
 1. https://github.com/valentinzubok/MetaEvidence
-2. LIVE_URL_AFTER_DEPLOY
+2. https://metaevidence-console.vercel.app
 3. https://github.com/valentinzubok/MetaEvidence/blob/main/contracts/MetaEvidence.py
 4. https://explorer-studio.genlayer.com/address/0xF39330E2233E612CCcbAb1B148C94b136dEAE54C

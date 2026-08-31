@@ -44,7 +44,7 @@ See [`docs/API.md`](docs/API.md).
 ## Demo
 
 - **Static flow mock:** https://valentinzubok.github.io/MetaEvidence/
-- **Project app (Studionet):** `web/` — Next.js + MetaMask + genlayer-js
+- **Project app (Studionet):** https://metaevidence-console.vercel.app (`web/` — Next.js + MetaMask + genlayer-js)
 
 ```bash
 cd web && npm install && npm run dev   # http://localhost:3001
