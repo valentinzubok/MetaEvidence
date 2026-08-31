@@ -4,6 +4,9 @@ export const CONTRACT_ADDRESS = (process.env.NEXT_PUBLIC_METAEVIDENCE_ADDRESS ??
 export const EXPLORER =
   "https://explorer-studio.genlayer.com/address/0xF39330E2233E612CCcbAb1B148C94b136dEAE54C";
 
+export const GITHUB =
+  "https://github.com/valentinzubok/MetaEvidence";
+
 export const DEMO_URL = "https://test-server.genlayer.com/static/genvm/hello.html";
 
 export const DEFAULT_SCHEMA = "model-v1";

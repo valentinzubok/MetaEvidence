@@ -6,6 +6,7 @@ import {
   DEFAULT_SCHEMA,
   DEMO_URL,
   EXPLORER,
+  GITHUB,
   SCHEMA_JSON,
 } from "@/lib/config";
 import {
@@ -25,6 +26,7 @@ export function MetaEvidenceApp() {
   const [ids, setIds] = useState<string[]>([]);
   const [rows, setRows] = useState<EvidenceRow[]>([]);
   const [stats, setStats] = useState<string>("");
+  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState("");
   const [tx, setTx] = useState("");
   const [msg, setMsg] = useState("");
@@ -34,6 +36,8 @@ export function MetaEvidenceApp() {
   const [metadata, setMetadata] = useState(DEFAULT_METADATA);
 
   const refresh = useCallback(async () => {
+    setLoading(true);
+    setMsg("");
     try {
       const list = await listIds();
       setIds(list);
@@ -42,7 +46,9 @@ export function MetaEvidenceApp() {
       const s = await getStats();
       setStats(s ? JSON.stringify(s) : "");
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "read failed");
+      setMsg(e instanceof Error ? e.message : "Studionet read failed");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -52,7 +58,7 @@ export function MetaEvidenceApp() {
 
   const run = async (label: string, fn: () => Promise<string>) => {
     if (!address || !provider) {
-      setMsg("Connect MetaMask first");
+      setMsg("Connect MetaMask for write transactions");
       return;
     }
     setBusy(label);
@@ -61,7 +67,7 @@ export function MetaEvidenceApp() {
     try {
       const hash = await fn();
       setTx(hash);
-      setMsg(`${label} accepted — refresh list`);
+      setMsg(`${label} submitted (ACCEPTED) — data refreshed`);
       await refresh();
     } catch (e) {
       setMsg(e instanceof Error ? e.message : String(e));
@@ -75,31 +81,33 @@ export function MetaEvidenceApp() {
       <header>
         <h1>MetaEvidence Console</h1>
         <p className="muted">
-          Schema passport app — attach live URL evidence, audit, appeal on Studionet.
+          Schema passport on Studionet — register schemas, freeze live URLs, audit metadata,
+          appeal invalid records. Reads work without wallet (click Refresh).
         </p>
         <div className="row">
           {address ? (
-            <span className="pill ok">{address.slice(0, 6)}…{address.slice(-4)}</span>
+            <span className="pill ok">
+              {address.slice(0, 6)}…{address.slice(-4)}
+            </span>
           ) : (
             <button type="button" onClick={() => void connect()}>
               Connect MetaMask
             </button>
           )}
-          <a href={EXPLORER} target="_blank" rel="noreferrer">
-            Explorer
-          </a>
-          <button type="button" className="ghost" onClick={() => void refresh()}>
-            Refresh
+          <button type="button" className="ghost" onClick={() => void refresh()} disabled={loading}>
+            {loading ? "Loading…" : "Refresh"}
           </button>
         </div>
-        {(error || msg) && <p className="msg">{error || msg}</p>}
+        {error && <p className="msg">{error}</p>}
+        {msg && <p className={msg.includes("failed") ? "msg" : "okmsg"}>{msg}</p>}
         {tx && <p className="tx">tx: {tx}</p>}
-        {stats && <p className="muted">stats: {stats}</p>}
+        {stats && <p className="muted">on-chain stats: {stats}</p>}
       </header>
 
       <section className="grid">
         <div className="card">
           <h2>Register schema</h2>
+          <p className="muted">Wallet required. Fails if model-v1 already exists.</p>
           <button
             type="button"
             disabled={!ready || !!busy}
@@ -143,7 +151,11 @@ export function MetaEvidenceApp() {
       </section>
 
       <section className="card">
-        <h2>On-chain evidence ({ids.length})</h2>
+        <h2>On-chain evidence ({loading ? "…" : ids.length})</h2>
+        {loading && <p className="muted">Loading from Studionet…</p>}
+        {!loading && ids.length === 0 && (
+          <p className="muted">No records yet — smoke deploy has ev-1 on chain; try Refresh.</p>
+        )}
         <table>
           <thead>
             <tr>
@@ -167,9 +179,7 @@ export function MetaEvidenceApp() {
                       type="button"
                       disabled={!ready || !!busy}
                       onClick={() =>
-                        void run("audit", () =>
-                          auditEvidence(address!, provider, r.evidence_id),
-                        )
+                        void run("audit", () => auditEvidence(address!, provider, r.evidence_id))
                       }
                     >
                       audit
@@ -194,6 +204,16 @@ export function MetaEvidenceApp() {
           </tbody>
         </table>
       </section>
+
+      <footer className="footer">
+        <a href={GITHUB} target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+        <a href={EXPLORER} target="_blank" rel="noreferrer">
+          Studionet contract
+        </a>
+        <span className="muted">IC source: contracts/MetaEvidence.py · bindings: web/src/lib/contracts.ts</span>
+      </footer>
     </main>
   );
 }
