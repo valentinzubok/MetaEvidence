@@ -149,12 +149,12 @@ export function MetaEvidenceApp() {
 
         <div className="card">
           <h2>Attach evidence</h2>
-          <label>evidence_id</label>
-          <input value={evidenceId} onChange={(e) => setEvidenceId(e.target.value)} />
-          <label>source_url</label>
-          <input value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} />
-          <label>metadata_json</label>
-          <textarea rows={3} value={metadata} onChange={(e) => setMetadata(e.target.value)} />
+          <label htmlFor="evidence_id">evidence_id</label>
+          <input id="evidence_id" value={evidenceId} onChange={(e) => setEvidenceId(e.target.value)} />
+          <label htmlFor="source_url">source_url</label>
+          <input id="source_url" value={sourceUrl} onChange={(e) => setSourceUrl(e.target.value)} />
+          <label htmlFor="metadata_json">metadata_json</label>
+          <textarea rows={3} id="metadata_json" value={metadata} onChange={(e) => setMetadata(e.target.value)} />
           <button
             type="button"
             disabled={!ready || !!busy}
@@ -188,6 +188,7 @@ export function MetaEvidenceApp() {
               <th>id</th>
               <th>status</th>
               <th>hash</th>
+              <th>appeals</th>
               <th>actions</th>
             </tr>
           </thead>
@@ -199,6 +200,7 @@ export function MetaEvidenceApp() {
                   {r.status}
                 </td>
                 <td className="mono">{(r.data_hash || "").slice(0, 12)}…</td>
+                <td>{r.appeals ?? 0}</td>
                 <td className="row">
                   {r.status === "pending_audit" && (
                     <button
