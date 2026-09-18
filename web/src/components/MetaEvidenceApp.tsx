@@ -72,8 +72,9 @@ export function MetaEvidenceApp() {
     try {
       const hash = await fn();
       if (hash) setTx(hash);
-      setMsg(`${label} submitted (ACCEPTED) — data refreshed`);
+      // refresh() clears msg, so report success after the reload.
       await refresh();
+      setMsg(`${label} submitted (ACCEPTED) — data refreshed`);
     } catch (e) {
       setMsg(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
