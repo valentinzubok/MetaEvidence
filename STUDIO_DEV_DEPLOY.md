@@ -32,7 +32,7 @@ shasum -a 256 contracts/MetaEvidence.py
 | 5 | `audit("ev-2")` | **invalid** (schema check fails) | `0xbfe00885cac374977b5120707b50ef19f11ff038fe13a80280af1fd1286bd6ed` |
 | 6 | `appeal("ev-2")` | re-audited, still **invalid**, `appeals: 1` | `0xb7757b86c0933e284509a13e61644e3f788b02f597fb9e8f88a12f6bfbb35ac4` |
 
-Resulting state (`get_stats`): `{"schemas":1,"evidence_total":2,"pending_audit":0,"valid":1,"invalid":1,"audits":3,"max_appeals":3}`
+State right after these steps (`get_stats`): `{"schemas":1,"evidence_total":2,"pending_audit":0,"valid":1,"invalid":1,"audits":3,"max_appeals":3}`. More records (`ev-demo2-ok` valid, `ev-demo2-bad` invalid + appeal, and others) were added from the console itself while recording the demo video. Current total: 7 records, 5 valid, 2 invalid.
 
 ## Reproducible app path
 
@@ -42,5 +42,15 @@ Resulting state (`get_stats`): `{"schemas":1,"evidence_total":2,"pending_audit":
 3. **Attach evidence** with a new `evidence_id` (for example `ev-app-1`). Validators fetch `source_url` and agree on its SHA-256 under `eq_principle.strict_eq`.
 4. Click **audit** on the new row. Validators re-fetch the page, compare the hash, schema-check the metadata, and set the status to `valid` or `invalid`.
 5. For an `invalid` row, click **appeal** (max 3). Each action shows the tx hash linked to the explorer, and the table refreshes from chain.
+
+## Demo video
+
+[`assets/demo/metaevidence-demo.mp4`](https://github.com/valentinzubok/MetaEvidence/blob/main/assets/demo/metaevidence-demo.mp4): 2:32 recording of the live console on Studio Dev, with no mocks. It shows:
+- explorer → chain state loaded without a wallet → connect
+- `attach_evidence` → `audit` → **valid**
+- `attach_evidence` with missing `version` → `audit` → **invalid** → `appeal` → still invalid, appeals 1
+- the tx on the explorer
+
+For an unattended recording, a small EIP-1193 wallet signing with test keys is injected in place of the MetaMask popup. Consensus waits are sped up 8x and rate-limit pauses are cut.
 
 The earlier Studionet (61999) deployment `0xF39330…E54C` ran v0.2 and is superseded.

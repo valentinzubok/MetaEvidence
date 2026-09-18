@@ -26,7 +26,7 @@
 | **Console (Project)** | [`web/`](web/) — Next.js dApp on GenLayer Studio Dev (chain 61997) via **genlayer-js** + MetaMask |
 
 **Live console:** https://metaevidence-console.vercel.app  
-**Studio Dev (61997):** [`0x29f558390ac213D5697a4cf46e707111c0741122`](https://explorer-studio-dev.genlayer.com/address/0x29f558390ac213D5697a4cf46e707111c0741122) · on-chain code sha256 = `contracts/MetaEvidence.py` · [deploy record](STUDIO_DEV_DEPLOY.md)
+**Studio Dev (61997):** [`0x29f558390ac213D5697a4cf46e707111c0741122`](https://explorer-studio-dev.genlayer.com/address/0x29f558390ac213D5697a4cf46e707111c0741122) · on-chain code sha256 = `contracts/MetaEvidence.py` · [deploy record](STUDIO_DEV_DEPLOY.md) · [demo video](https://github.com/valentinzubok/MetaEvidence/blob/main/assets/demo/metaevidence-demo.mp4)
 
 Reads (`list_ids`, `get_evidence`) work **without wallet** — click **Refresh**. Writes need MetaMask on Studio Dev (the app switches the wallet to chain 61997; use **Get test GEN** for fees).
 
