@@ -1,12 +1,14 @@
-# { "Depends": "py-genlayer:15qfivjvy80800rh998pcxmd2m8va1wq2qzqhz850n8ggcr4i9q0" }
+# v0.3.0
+# { "Depends": "py-genlayer:5jycge4q8k23462jtb0b9fyey1s9qz928sz2nbrd9mg4sxqg2qng" }
 
-from genlayer import *
+import genlayer as gl
 import hashlib
 import json
 import re
 
 # MetaEvidence v0.2 — schema passport with live URL fetch under strict_eq.
-# Copyright (c) 2026 Valentyn Zubok. MIT License.
+# Copyright (c) 2026 Valentyn Zubok.
+# Runtime: GenVM v0.3.0-rc7 — Studio Dev / Studio Next (chain 61997).
 #
 # Lifecycle: register_schema → attach_evidence → audit → valid|invalid → appeal (max 3).
 # Consensus: eq_principle_strict_eq over get_webpage digest + deterministic schema check.
@@ -123,9 +125,9 @@ def _capture_source(url: str) -> str:
         "status": "error",
     }
     try:
-        raw = gl.get_webpage(url, mode="text")
+        raw = gl.nondet.web.render(url, mode="text")
         if raw is None or str(raw).strip() == "":
-            raw = gl.get_webpage(url, mode="html")
+            raw = gl.nondet.web.render(url, mode="html")
         normalized = _normalize(raw if raw is not None else "")
         if normalized == "":
             entry["status"] = "empty"
@@ -182,7 +184,7 @@ def _build_audit_report(schema: dict, metadata: dict, declared_hash: str, source
     )
 
 
-class MetaEvidence(gl.Contract):
+class MetaEvidence(gl.contract.Contract):
     owner: str
     fee_receiver: str
     fee_per_audit: str
@@ -273,7 +275,7 @@ class MetaEvidence(gl.Contract):
         def leader_fn() -> str:
             return _build_audit_report(schema, metadata, declared, source_url)
 
-        report_json = gl.eq_principle_strict_eq(leader_fn)
+        report_json = gl.eq_principle.strict_eq(leader_fn)
         report = json.loads(report_json)
         valid = bool(report.get("valid"))
         status = STATUS_VALID if valid else STATUS_INVALID
@@ -364,7 +366,7 @@ class MetaEvidence(gl.Contract):
         def leader_fn() -> str:
             return _capture_source(url)
 
-        snap_json = gl.eq_principle_strict_eq(leader_fn)
+        snap_json = gl.eq_principle.strict_eq(leader_fn)
         snap = json.loads(snap_json)
         if snap.get("status") != "ok":
             raise Exception("source_url fetch failed or empty — cannot attach")

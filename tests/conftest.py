@@ -37,13 +37,16 @@ def _install_fake_genlayer() -> None:
         return leader_fn()
 
     gl.Contract = object
+    # GenVM v0.3 API (Studio Dev 61997): gl.contract.Contract, gl.nondet.web.render
+    gl.contract = types.SimpleNamespace(Contract=object)
     gl.public = _Public()
     gl.message = types.SimpleNamespace(sender_address="0x1111111111111111111111111111111111111111")
     gl.eq_principle = _EqPrinciple()
     gl.eq_principle_strict_eq = _strict_eq
     gl.get_webpage = lambda url, mode="text": "Hello world!"
     gl.nondet = types.SimpleNamespace(
-        exec_prompt=lambda prompt, response_format="json": '{"passed": true}'
+        exec_prompt=lambda prompt, response_format="json": '{"passed": true}',
+        web=types.SimpleNamespace(render=lambda url, mode="text": gl.get_webpage(url, mode)),
     )
     gl.exec_prompt = lambda prompt: '{"passed": true}'
     gl.gl = gl

@@ -23,12 +23,12 @@
 | Layer | What |
 |-------|------|
 | **Intelligent Contract** | [`contracts/MetaEvidence.py`](contracts/MetaEvidence.py) — `get_webpage` + `eq_principle_strict_eq` freeze, schema audit |
-| **Console (Project)** | [`web/`](web/) — Next.js dApp on Studionet via **genlayer-js** + MetaMask |
+| **Console (Project)** | [`web/`](web/) — Next.js dApp on GenLayer Studio Dev (chain 61997) via **genlayer-js** + MetaMask |
 
 **Live console:** https://metaevidence-console.vercel.app  
-**Studionet:** [`0xF39330E2233E612CCcbAb1B148C94b136dEAE54C`](https://explorer-studio.genlayer.com/address/0xF39330E2233E612CCcbAb1B148C94b136dEAE54C)
+**Studio Dev (61997):** [`0x29f558390ac213D5697a4cf46e707111c0741122`](https://explorer-studio-dev.genlayer.com/address/0x29f558390ac213D5697a4cf46e707111c0741122) · on-chain code sha256 = `contracts/MetaEvidence.py` · [deploy record](STUDIO_DEV_DEPLOY.md)
 
-Reads (`list_ids`, `get_evidence`) work **without wallet** — click **Refresh**. Writes need MetaMask on Studionet.
+Reads (`list_ids`, `get_evidence`) work **without wallet** — click **Refresh**. Writes need MetaMask on Studio Dev (the app switches the wallet to chain 61997; use **Get test GEN** for fees).
 
 > Static flow preview (localStorage mock, not on-chain): [GitHub Pages demo](https://valentinzubok.github.io/MetaEvidence/) — for UI sketch only.
 

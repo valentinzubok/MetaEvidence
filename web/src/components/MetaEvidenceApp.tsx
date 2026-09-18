@@ -5,10 +5,13 @@ import {
   DEFAULT_METADATA,
   DEFAULT_SCHEMA,
   DEMO_URL,
+  CHAIN_ID,
   EXPLORER,
   GITHUB,
   SCHEMA_JSON,
+  txUrl,
 } from "@/lib/config";
+import { fundWithTestGen, getNativeBalance } from "@/lib/genlayer";
 import {
   appealEvidence,
   attachEvidence,
@@ -30,6 +33,7 @@ export function MetaEvidenceApp() {
   const [busy, setBusy] = useState("");
   const [tx, setTx] = useState("");
   const [msg, setMsg] = useState("");
+  const [gen, setGen] = useState("");
 
   const [evidenceId, setEvidenceId] = useState("ev-app-1");
   const [sourceUrl, setSourceUrl] = useState(DEMO_URL);
@@ -45,18 +49,19 @@ export function MetaEvidenceApp() {
       setRows(loaded.filter(Boolean) as EvidenceRow[]);
       const s = await getStats();
       setStats(s ? JSON.stringify(s) : "");
+      if (address) setGen(await getNativeBalance(address));
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : "Studionet read failed");
+      setMsg(`Error: ${e instanceof Error ? e.message : "read failed"}`);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [address]);
 
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
-  const run = async (label: string, fn: () => Promise<string>) => {
+  const run = async (label: string, fn: () => Promise<string | void>) => {
     if (!address || !provider) {
       setMsg("Connect MetaMask for write transactions");
       return;
@@ -66,11 +71,11 @@ export function MetaEvidenceApp() {
     setTx("");
     try {
       const hash = await fn();
-      setTx(hash);
+      if (hash) setTx(hash);
       setMsg(`${label} submitted (ACCEPTED) — data refreshed`);
       await refresh();
     } catch (e) {
-      setMsg(e instanceof Error ? e.message : String(e));
+      setMsg(`Error: ${e instanceof Error ? e.message : String(e)}`);
     } finally {
       setBusy("");
     }
@@ -81,8 +86,9 @@ export function MetaEvidenceApp() {
       <header>
         <h1>MetaEvidence Console</h1>
         <p className="muted">
-          Schema passport on Studionet — register schemas, freeze live URLs, audit metadata,
-          appeal invalid records. Reads work without wallet (click Refresh).
+          Schema passport on GenLayer Studio Dev (chain {CHAIN_ID}) — register schemas, freeze
+          live URLs, audit metadata, appeal invalid records. Every value below is read from the
+          contract; reads work without a wallet.
         </p>
         <div className="row">
           {address ? (
@@ -94,13 +100,33 @@ export function MetaEvidenceApp() {
               Connect MetaMask
             </button>
           )}
+          {address && (
+            <button
+              type="button"
+              className="ghost"
+              disabled={!!busy}
+              onClick={() =>
+                void run("faucet", () => fundWithTestGen(address as `0x${string}`))
+              }
+            >
+              Get test GEN{gen ? ` (${gen})` : ""}
+            </button>
+          )}
           <button type="button" className="ghost" onClick={() => void refresh()} disabled={loading}>
             {loading ? "Loading…" : "Refresh"}
           </button>
         </div>
         {error && <p className="msg">{error}</p>}
-        {msg && <p className={msg.includes("failed") ? "msg" : "okmsg"}>{msg}</p>}
-        {tx && <p className="tx">tx: {tx}</p>}
+        {msg && <p className={msg.startsWith("Error") ? "msg" : "okmsg"}>{msg}</p>}
+        {busy && <p className="muted">Waiting for GenLayer consensus: {busy}…</p>}
+        {tx && (
+          <p className="tx">
+            tx:{" "}
+            <a href={txUrl(tx)} target="_blank" rel="noreferrer">
+              {tx}
+            </a>
+          </p>
+        )}
         {stats && <p className="muted">on-chain stats: {stats}</p>}
       </header>
 
@@ -152,7 +178,7 @@ export function MetaEvidenceApp() {
 
       <section className="card">
         <h2>On-chain evidence ({loading ? "…" : ids.length})</h2>
-        {loading && <p className="muted">Loading from Studionet…</p>}
+        {loading && <p className="muted">Loading from Studio Dev…</p>}
         {!loading && ids.length === 0 && (
           <p className="muted">No records yet — smoke deploy has ev-1 on chain; try Refresh.</p>
         )}
@@ -210,7 +236,7 @@ export function MetaEvidenceApp() {
           GitHub
         </a>
         <a href={EXPLORER} target="_blank" rel="noreferrer">
-          Studionet contract
+          Studio Dev contract
         </a>
         <span className="muted">IC source: contracts/MetaEvidence.py · bindings: web/src/lib/contracts.ts</span>
       </footer>

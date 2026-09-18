@@ -1,3 +1,5 @@
+> **Legacy (v0.2, Studionet 61999).** Current deployment and submission: [`STUDIO_DEV_DEPLOY.md`](STUDIO_DEV_DEPLOY.md) · [`PROJECT_SUBMIT.md`](PROJECT_SUBMIT.md).
+
 # Portal — MetaEvidence v0.2 (Intelligent Contracts)
 
 **Type:** Builder → Intelligent Contracts

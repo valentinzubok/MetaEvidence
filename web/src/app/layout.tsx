@@ -5,7 +5,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "MetaEvidence Console",
-  description: "Schema passport app on GenLayer Studionet — attach, audit, appeal evidence.",
+  description: "Schema passport app on GenLayer Studio Dev (chain 61997) — attach, audit, appeal evidence.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,7 +5,8 @@ GenLayer IC for schema passports with live URL freeze under `eq_principle_strict
 | Item | Value |
 |------|--------|
 | File | [`MetaEvidence.py`](./MetaEvidence.py) |
-| Studionet | [`0xF39330E2233E612CCcbAb1B148C94b136dEAE54C`](https://explorer-studio.genlayer.com/address/0xF39330E2233E612CCcbAb1B148C94b136dEAE54C) |
+| Studio Dev (61997) | [`0x29f558390ac213D5697a4cf46e707111c0741122`](https://explorer-studio-dev.genlayer.com/address/0x29f558390ac213D5697a4cf46e707111c0741122) |
+| Legacy Studionet (61999) | `0xF39330E2233E612CCcbAb1B148C94b136dEAE54C` (v0.2, superseded) |
 | App bindings | [`web/src/lib/contracts.ts`](../web/src/lib/contracts.ts) |
 
 ## Method alignment (app ↔ contract)

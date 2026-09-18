@@ -26,7 +26,7 @@ vercel --prod
 # Set root to web if deploying from monorepo in Vercel UI
 ```
 
-Env: `NEXT_PUBLIC_METAEVIDENCE_ADDRESS=0xF39330E2233E612CCcbAb1B148C94b136dEAE54C`
+Env (optional, defaults to the live deploy): `NEXT_PUBLIC_METAEVIDENCE_ADDRESS=0x29f558390ac213D5697a4cf46e707111c0741122` — Studio Dev (61997). Deploy record: [`STUDIO_DEV_DEPLOY.md`](STUDIO_DEV_DEPLOY.md)
 
 ## Title
 
